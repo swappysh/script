@@ -1,9 +1,10 @@
 #!/bin/bash
 # @Author: doody
 # @Date:   2016-07-21 12:30:59
-# @Last Modified by:   doody
-# @Last Modified time: 2016-07-26 23:56:46
+# @Last Modified by:   swapsharma
+# @Last Modified time: 2016-07-27 01:10:26
 # @Todo: Support for all major os
+# @Todo: Need to make script more robust
 
 # To install git-annex
 sudo apt-get install haskell-platform
