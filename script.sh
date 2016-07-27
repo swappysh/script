@@ -10,22 +10,29 @@
 sudo apt-get install haskell-platform
 git clone git://git-annex.branchable.com/ ~/git-annex
 
-if [ `uname -s` = "Linux" ]; then
-	sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 575159689BEFB442
-	version=`lsb_release -r | cut -f2`
-	case ${version} in
-		16.04 ) echo 'deb http://download.fpcomplete.com/ubuntu xenial main'|sudo tee /etc/apt/sources.list.d/fpco.list
-			;;
-		15.10 ) echo 'deb http://download.fpcomplete.com/ubuntu wily main'|sudo tee /etc/apt/sources.list.d/fpco.list
-			;;
-		14.04 ) echo 'deb http://download.fpcomplete.com/ubuntu trusty main'|sudo tee /etc/apt/sources.list.d/fpco.list
-			;;
-		12.04 ) echo 'deb http://download.fpcomplete.com/ubuntu precise main'|sudo tee /etc/apt/sources.list.d/fpco.list
-			;;
-	esac
+# Install stack
+os = `uname -s`
+case ${os} in
+	"Linux" )
+		sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 575159689BEFB442
+		version=`lsb_release -r | cut -f2`
+		case ${version} in
+			16.04 ) echo 'deb http://download.fpcomplete.com/ubuntu xenial main'|sudo tee /etc/apt/sources.list.d/fpco.list
+				;;
+			15.10 ) echo 'deb http://download.fpcomplete.com/ubuntu wily main'|sudo tee /etc/apt/sources.list.d/fpco.list
+				;;
+			14.04 ) echo 'deb http://download.fpcomplete.com/ubuntu trusty main'|sudo tee /etc/apt/sources.list.d/fpco.list
+				;;
+			12.04 ) echo 'deb http://download.fpcomplete.com/ubuntu precise main'|sudo tee /etc/apt/sources.list.d/fpco.list
+				;;
+		esac
 
-	sudo apt-get update && sudo apt-get install stack -y
-fi
+		sudo apt-get update && sudo apt-get install stack -y
+		;;
+	"Darwin" )
+		brew install haskell-stack
+		;;
+esac
 
 cd ~/git-annex
 stack setup
@@ -35,12 +42,21 @@ mv ~/.local/bin/git-annex ~/bin
 # TO set-up rclone
 cd ~/
 if [ `uname -s` = "Linux" ]; then
-	arch=`uname -i`
-	case ${arch} in
-		x86_64 ) wget http://downloads.rclone.org/rclone-current-linux-386.zip
+case ${os} in
+	"Linux" )
+		arch=`uname -i`
+		case ${arch} in
+			x86_64 ) wget http://downloads.rclone.org/rclone-current-linux-386.zip
+				;;
+		esac
+		;;
+	"Darwin" )
+		arch=`uname -p`
+		case ${arch} in
+			i386 ) curl "http://downloads.rclone.org/rclone-current-osx-386.zip" -o rclone-v1.17-linux-amd64.zip
 			;;
-	esac
-fi
+		;;
+esac
 
 unzip rclone-v1.17-linux-amd64.zip
 cd rclone-v1.17-linux-amd64
