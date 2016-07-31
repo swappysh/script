@@ -2,14 +2,16 @@
 # @Author: doody
 # @Date:   2016-07-21 12:30:59
 # @Last Modified by:   swapsharma
-# @Last Modified time: 2016-07-27 01:10:26
+# @Last Modified time: 2016-07-31 17:13:05
 # @Todo: Support for all major os
 # @Todo: Need to make script more robust
 
 # To install git-annex
 sudo apt-get install haskell-platform
+echo "Cloning git-annex repository ..."
 git clone git://git-annex.branchable.com/ ~/git-annex
 
+echo "Installing stack ..."
 if [ `uname -s` = "Linux" ]; then
 	sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 575159689BEFB442
 	version=`lsb_release -r | cut -f2`
@@ -27,12 +29,14 @@ if [ `uname -s` = "Linux" ]; then
 	sudo apt-get update && sudo apt-get install stack -y
 fi
 
+echo "Compiling git-annex using stack ..."
 cd ~/git-annex
 stack setup
 stack install
 mv ~/.local/bin/git-annex ~/bin
 
-# TO set-up rclone
+# To set-up rclone
+echo "Downloading rclone ..."
 cd ~/
 if [ `uname -s` = "Linux" ]; then
 	arch=`uname -i`
@@ -42,6 +46,7 @@ if [ `uname -s` = "Linux" ]; then
 	esac
 fi
 
+echo "Installing rclone ..."
 unzip rclone-v1.17-linux-amd64.zip
 cd rclone-v1.17-linux-amd64
 #copy binary file
@@ -53,6 +58,7 @@ sudo mkdir -p /usr/local/share/man/man1
 sudo cp rclone.1 /usr/local/share/man/man1/
 sudo mandb 
 
+echo "Downloading and Installing git-annex-remote-rclone ..."
 # To set up git-annex-remote-rclone
 cd ~
 wget https://github.com/DanielDent/git-annex-remote-rclone/archive/master.zip
