@@ -2,14 +2,16 @@
 # @Author: doody
 # @Date:   2016-07-21 12:30:59
 # @Last Modified by:   swapsharma
-# @Last Modified time: 2016-07-27 01:10:26
+# @Last Modified time: 2016-07-31 17:13:05
 # @Todo: Support for all major os
 # @Todo: Need to make script more robust
 
 # To install git-annex
 sudo apt-get install haskell-platform
+echo "Cloning git-annex repository ..."
 git clone git://git-annex.branchable.com/ ~/git-annex
 
+<<<<<<< HEAD
 # Install stack
 os = `uname -s`
 case ${os} in
@@ -26,6 +28,22 @@ case ${os} in
 			12.04 ) echo 'deb http://download.fpcomplete.com/ubuntu precise main'|sudo tee /etc/apt/sources.list.d/fpco.list
 				;;
 		esac
+=======
+echo "Installing stack ..."
+if [ `uname -s` = "Linux" ]; then
+	sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 575159689BEFB442
+	version=`lsb_release -r | cut -f2`
+	case ${version} in
+		16.04 ) echo 'deb http://download.fpcomplete.com/ubuntu xenial main'|sudo tee /etc/apt/sources.list.d/fpco.list
+			;;
+		15.10 ) echo 'deb http://download.fpcomplete.com/ubuntu wily main'|sudo tee /etc/apt/sources.list.d/fpco.list
+			;;
+		14.04 ) echo 'deb http://download.fpcomplete.com/ubuntu trusty main'|sudo tee /etc/apt/sources.list.d/fpco.list
+			;;
+		12.04 ) echo 'deb http://download.fpcomplete.com/ubuntu precise main'|sudo tee /etc/apt/sources.list.d/fpco.list
+			;;
+	esac
+>>>>>>> 46562fdeafb8aaec32379ef57e600b4f2313fc05
 
 		sudo apt-get update && sudo apt-get install stack -y
 		;;
@@ -34,12 +52,14 @@ case ${os} in
 		;;
 esac
 
+echo "Compiling git-annex using stack ..."
 cd ~/git-annex
 stack setup
 stack install
 mv ~/.local/bin/git-annex ~/bin
 
-# TO set-up rclone
+# To set-up rclone
+echo "Downloading rclone ..."
 cd ~/
 if [ `uname -s` = "Linux" ]; then
 case ${os} in
@@ -58,6 +78,7 @@ case ${os} in
 		;;
 esac
 
+echo "Installing rclone ..."
 unzip rclone-v1.17-linux-amd64.zip
 cd rclone-v1.17-linux-amd64
 #copy binary file
@@ -69,6 +90,7 @@ sudo mkdir -p /usr/local/share/man/man1
 sudo cp rclone.1 /usr/local/share/man/man1/
 sudo mandb 
 
+echo "Downloading and Installing git-annex-remote-rclone ..."
 # To set up git-annex-remote-rclone
 cd ~
 wget https://github.com/DanielDent/git-annex-remote-rclone/archive/master.zip
