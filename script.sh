@@ -7,15 +7,16 @@
 # @Todo: Need to make script more robust
 
 # To install git-annex
-sudo apt-get install haskell-platform
 echo "Cloning git-annex repository ..."
 git clone git://git-annex.branchable.com/ ~/git-annex
 
-<<<<<<< HEAD
+echo "Installing stack ..."
 # Install stack
-os = `uname -s`
+os=`uname -s`
 case ${os} in
 	"Linux" )
+		# Installing haskell-platform
+		sudo apt-get install haskell-platform
 		sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 575159689BEFB442
 		version=`lsb_release -r | cut -f2`
 		case ${version} in
@@ -28,26 +29,11 @@ case ${os} in
 			12.04 ) echo 'deb http://download.fpcomplete.com/ubuntu precise main'|sudo tee /etc/apt/sources.list.d/fpco.list
 				;;
 		esac
-=======
-echo "Installing stack ..."
-if [ `uname -s` = "Linux" ]; then
-	sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 575159689BEFB442
-	version=`lsb_release -r | cut -f2`
-	case ${version} in
-		16.04 ) echo 'deb http://download.fpcomplete.com/ubuntu xenial main'|sudo tee /etc/apt/sources.list.d/fpco.list
-			;;
-		15.10 ) echo 'deb http://download.fpcomplete.com/ubuntu wily main'|sudo tee /etc/apt/sources.list.d/fpco.list
-			;;
-		14.04 ) echo 'deb http://download.fpcomplete.com/ubuntu trusty main'|sudo tee /etc/apt/sources.list.d/fpco.list
-			;;
-		12.04 ) echo 'deb http://download.fpcomplete.com/ubuntu precise main'|sudo tee /etc/apt/sources.list.d/fpco.list
-			;;
-	esac
->>>>>>> 46562fdeafb8aaec32379ef57e600b4f2313fc05
 
 		sudo apt-get update && sudo apt-get install stack -y
 		;;
 	"Darwin" )
+		brew install ghc
 		brew install haskell-stack
 		;;
 esac
@@ -56,12 +42,12 @@ echo "Compiling git-annex using stack ..."
 cd ~/git-annex
 stack setup
 stack install
-mv ~/.local/bin/git-annex ~/bin
+echo "Copied fom ~/.local/bin/git-annex to /bin"
+sudo mv ~/.local/bin/git-annex /bin
 
 # To set-up rclone
 echo "Downloading rclone ..."
 cd ~/
-if [ `uname -s` = "Linux" ]; then
 case ${os} in
 	"Linux" )
 		arch=`uname -i`
@@ -75,30 +61,74 @@ case ${os} in
 		case ${arch} in
 			i386 ) curl "http://downloads.rclone.org/rclone-current-osx-386.zip" -o rclone-v1.17-linux-amd64.zip
 			;;
+		esac
 		;;
 esac
 
 echo "Installing rclone ..."
-unzip rclone-v1.17-linux-amd64.zip
-cd rclone-v1.17-linux-amd64
+case ${os} in
+	"Linux" )
+		unzip rclone-v1.17-linux-amd64.zip
+		cd rclone-v1.17-linux-amd64
+		;;
+	"Darwin" )
+		unzip rclone-v1.17-linux-amd64.zip
+		cd rclone-v1.32-osx-386
+		;;
+esac
+
 #copy binary file
 sudo cp rclone /usr/sbin/
-sudo chown root:root /usr/sbin/rclone
+
+case ${os} in
+	"Linux" )
+		sudo chown root:root /usr/sbin/rclone
+		;;
+	"Darwin" )
+		sudo chown root:admin /usr/sbin/rclone
+		;;
+esac
+
 sudo chmod 755 /usr/sbin/rclone
 #install manpage
 sudo mkdir -p /usr/local/share/man/man1
 sudo cp rclone.1 /usr/local/share/man/man1/
-sudo mandb 
+
+case ${os} in
+	"Linux" )
+		sudo mandb
+		;;
+	"Darwin" )
+		sudo /usr/libexec/makewhatis
+		;;
+esac
 
 echo "Downloading and Installing git-annex-remote-rclone ..."
 # To set up git-annex-remote-rclone
 cd ~
-wget https://github.com/DanielDent/git-annex-remote-rclone/archive/master.zip
+case ${os} in
+	"Linux" )
+		wget https://github.com/DanielDent/git-annex-remote-rclone/archive/master.zip
+		;;
+	"Darwin" )
+		curl "https://codeload.github.com/DanielDent/git-annex-remote-rclone/zip/master" -o git-annex-remote-rclone-master.zip
+		;;
+esac
+
 unzip git-annex-remote-rclone-master.zip
 cd git-annex-remote-rclone-master
 sudo cp git-annex-remote-rclone /usr/sbin
-sudo chown root:root /usr/sbin/rclone
-sudo chmod 755 /usr/sbin/rclone
+
+case ${os} in
+	"Linux" )
+		sudo chown root:root /usr/sbin/git-annex-remote-rclone
+		;;
+	"Darwin" )
+		sudo chown root:admin /usr/sbin/git-annex-remote-rclone
+		;;
+esac
+
+sudo chmod 755 /usr/sbin/git-annex-remote-rclone
 
 # Steps to make git annex usage abstract
 echo "
